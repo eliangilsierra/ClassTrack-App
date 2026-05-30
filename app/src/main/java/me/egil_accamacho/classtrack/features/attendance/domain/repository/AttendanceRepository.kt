@@ -6,7 +6,7 @@ import me.egil_accamacho.classtrack.features.attendance.domain.model.AttendanceS
 import me.egil_accamacho.classtrack.features.attendance.domain.model.CheckInResult
 
 interface AttendanceRepository {
-    suspend fun createSession(courseId: Long): Resource<AttendanceSession>
+    suspend fun createSession(courseId: Long, durationMinutes: Int? = null): Resource<AttendanceSession>
     suspend fun closeSession(sessionId: Long): Resource<Unit>
     suspend fun checkIn(sessionId: Long, latitude: Double, longitude: Double): Resource<CheckInResult>
     suspend fun getRecords(sessionId: Long): Resource<List<AttendanceRecord>>

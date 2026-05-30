@@ -20,8 +20,6 @@ import me.egil_accamacho.classtrack.core.qr.QrEncoder
 import me.egil_accamacho.classtrack.features.attendance.domain.usecase.CloseAttendanceSessionUseCase
 import me.egil_accamacho.classtrack.features.attendance.domain.usecase.GetAttendanceRecordsUseCase
 import me.egil_accamacho.classtrack.navigation.Destination
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,9 +31,9 @@ class AttendanceQrViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val dest = savedStateHandle.toRoute<Destination.AttendanceQr>()
-    private val sessionId: Long  = dest.sessionId
-    private val qrToken: String  = dest.qrToken
-    private val expiresAt: String = dest.expiresAt
+    private val sessionId: Long      = dest.sessionId
+    private val qrToken: String      = dest.qrToken
+    private val durationMinutes: Int = dest.durationMinutes
 
     private val _state = MutableStateFlow(AttendanceQrUiState())
     val state: StateFlow<AttendanceQrUiState> = _state.asStateFlow()
@@ -58,9 +56,15 @@ class AttendanceQrViewModel @Inject constructor(
     private fun generateQr() {
         viewModelScope.launch {
             val content = """{"type":"ATTENDANCE","sessionId":$sessionId,"token":"$qrToken"}"""
-            val remaining = computeRemainingSeconds(expiresAt)
+            val total = durationMinutes * 60
             val bitmap = qrEncoder.encode(content).getOrNull()
-            _state.update { it.copy(qrBitmap = bitmap, remainingSeconds = remaining) }
+            _state.update {
+                it.copy(
+                    qrBitmap         = bitmap,
+                    remainingSeconds = total,
+                    totalSeconds     = total,
+                )
+            }
         }
     }
 
@@ -94,8 +98,4 @@ class AttendanceQrViewModel @Inject constructor(
         }
     }
 
-    private fun computeRemainingSeconds(expiresAtStr: String): Int = runCatching {
-        val expiry = LocalDateTime.parse(expiresAtStr)
-        ChronoUnit.SECONDS.between(LocalDateTime.now(), expiry).coerceAtLeast(0).toInt()
-    }.getOrDefault(300)
 }

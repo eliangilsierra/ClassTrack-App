@@ -40,8 +40,9 @@ class CreateAttendanceSessionViewModel @Inject constructor(
 
     fun onEvent(event: CreateAttendanceSessionEvent) {
         when (event) {
-            CreateAttendanceSessionEvent.CreateSession -> createSession()
-            CreateAttendanceSessionEvent.DismissError  -> _state.update { it.copy(error = null) }
+            CreateAttendanceSessionEvent.CreateSession        -> createSession()
+            CreateAttendanceSessionEvent.DismissError         -> _state.update { it.copy(error = null) }
+            is CreateAttendanceSessionEvent.DurationChanged   -> _state.update { it.copy(durationMinutes = event.minutes) }
         }
     }
 
@@ -56,15 +57,17 @@ class CreateAttendanceSessionViewModel @Inject constructor(
 
     private fun createSession() {
         viewModelScope.launch {
+            val duration = _state.value.durationMinutes
             _state.update { it.copy(loading = true) }
-            when (val r = createAttendanceSessionUseCase(courseId)) {
+            when (val r = createAttendanceSessionUseCase(courseId, duration)) {
                 is Resource.Success -> {
                     _state.update { it.copy(loading = false) }
                     _actions.emit(
                         CreateAttendanceSessionAction.NavigateToQr(
-                            sessionId = r.data.sessionId,
-                            qrToken   = r.data.qrToken,
-                            expiresAt = r.data.expiresAt,
+                            sessionId       = r.data.sessionId,
+                            qrToken         = r.data.qrToken,
+                            expiresAt       = r.data.expiresAt,
+                            durationMinutes = duration,
                         ),
                     )
                 }

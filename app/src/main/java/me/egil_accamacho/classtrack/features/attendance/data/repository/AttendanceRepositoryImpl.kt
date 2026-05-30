@@ -17,9 +17,10 @@ class AttendanceRepositoryImpl @Inject constructor(
     private val errorMapper: ErrorMapper,
 ) : AttendanceRepository {
 
-    override suspend fun createSession(courseId: Long): Resource<AttendanceSession> =
+    override suspend fun createSession(courseId: Long, durationMinutes: Int?): Resource<AttendanceSession> =
         safeCall(errorMapper) {
-            val dto = api.createSession(CreateSessionRequest(courseId))
+            val dto = api.createSession(CreateSessionRequest(courseId, durationMinutes)).data
+                ?: throw Exception("Respuesta de sesión de asistencia vacía")
             AttendanceSession(
                 sessionId = dto.sessionId,
                 courseId  = dto.courseId,
@@ -33,13 +34,14 @@ class AttendanceRepositoryImpl @Inject constructor(
 
     override suspend fun checkIn(sessionId: Long, latitude: Double, longitude: Double): Resource<CheckInResult> =
         safeCall(errorMapper) {
-            val dto = api.checkIn(CheckInRequest(sessionId, latitude, longitude))
+            val dto = api.checkIn(CheckInRequest(sessionId, latitude, longitude)).data
+                ?: throw Exception("Respuesta de check-in vacía")
             CheckInResult(attendanceId = dto.attendanceId, registeredAt = dto.registeredAt)
         }
 
     override suspend fun getRecords(sessionId: Long): Resource<List<AttendanceRecord>> =
         safeCall(errorMapper) {
-            api.getRecords(sessionId).map {
+            (api.getRecords(sessionId).data ?: emptyList()).map {
                 AttendanceRecord(studentId = it.studentId, studentName = it.studentName, registeredAt = it.registeredAt)
             }
         }

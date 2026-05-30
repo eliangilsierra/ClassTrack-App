@@ -45,6 +45,7 @@ sealed class Destination {
         val sessionId: Long,
         val qrToken: String,
         val expiresAt: String,
+        val durationMinutes: Int = 30,
     ) : Destination()
     @Serializable data object AttendanceScanner : Destination()
     @Serializable data class AttendanceSuccess(
