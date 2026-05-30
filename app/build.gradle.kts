@@ -1,15 +1,31 @@
+import java.util.Properties
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Resolve BASE_URL: local.properties → env var → empty placeholder
+// Add BASE_URL=https://api.classtrack.app/api/v1/ to local.properties or set
+// the BASE_URL environment variable before building.
+// ─────────────────────────────────────────────────────────────────────────────
+val localProps = Properties().also { props ->
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) localFile.inputStream().use { props.load(it) }
+}
+val baseUrl: String =
+    localProps.getProperty("BASE_URL")
+        ?: System.getenv("BASE_URL")
+        ?: "https://api.classtrack.app/api/v1/"
+
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "me.egil_accamacho.classtrack"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "me.egil_accamacho.classtrack"
@@ -19,6 +35,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // API base URL injected at build time
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
     buildTypes {
@@ -30,24 +49,85 @@ android {
             )
         }
     }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
+    // ── Core ────────────────────────────────────────────────────────────────
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // ── Compose BOM ─────────────────────────────────────────────────────────
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+
+    // ── Lifecycle ───────────────────────────────────────────────────────────
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
+
+    // ── Dependency Injection (Hilt) ──────────────────────────────────────────
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.hilt.navigation.compose)
+
+    // ── Navigation ───────────────────────────────────────────────────────────
+    implementation(libs.navigation.compose)
+
+    // ── Networking ───────────────────────────────────────────────────────────
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.okhttp.core)
+    implementation(libs.okhttp.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
+
+    // ── Persistence ───────────────────────────────────────────────────────────
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.datastore.preferences)
+
+    // ── Camera ────────────────────────────────────────────────────────────────
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // ── QR ────────────────────────────────────────────────────────────────────
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.zxing.core)
+
+    // ── Image Loading ─────────────────────────────────────────────────────────
+    implementation(libs.coil.compose)
+
+    // ── Coroutines ────────────────────────────────────────────────────────────
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
+
+    // ── Permissions ───────────────────────────────────────────────────────────
+    implementation(libs.accompanist.permissions)
+
+    // ── Google Play Services ──────────────────────────────────────────────────
+    implementation(libs.play.services.location)
+
+    // ── Testing ───────────────────────────────────────────────────────────────
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
