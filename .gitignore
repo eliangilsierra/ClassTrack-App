@@ -1,6 +1,7 @@
 *.iml
 .gradle
 /local.properties
+local.properties
 /.idea/
 /.kotlin/
 .DS_Store
@@ -8,4 +9,20 @@
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+
+# ── Archivos de planificación local ──────────────────────────────────────────
+GIT_MIGRATION_PLAN.md
+
+# ── Archivos sensibles ────────────────────────────────────────────────────────
+# Firebase — nunca commitear; cada desarrollador obtiene el suyo de Firebase Console
+app/google-services.json
+google-services.json
+
+# Keystores y credenciales de firma
+*.jks
+*.keystore
+keystore.properties
+
+# Variables de entorno
+.env
+.env.*
