@@ -1,5 +1,6 @@
 package me.egil_accamacho.classtrack.features.reports.presentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -175,4 +176,6 @@ fun AttendanceReportScreen(
 
 private fun formatTime(raw: String): String = runCatching {
     raw.substringAfter("T").take(5)
+}.onFailure {
+    Log.e("AttendanceReportScreen", "Error formatting time: $raw", it)
 }.getOrDefault(raw)

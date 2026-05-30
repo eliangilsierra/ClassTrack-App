@@ -2,6 +2,7 @@ package me.egil_accamacho.classtrack.core.qr
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.util.Log
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -39,6 +40,8 @@ class QrEncoder @Inject constructor(
                     }
                 }
                 bitmap
+            }.onFailure {
+                Log.e("QrEncoder", "Failed to encode QR: ${it.message}", it)
             }
         }
 }
