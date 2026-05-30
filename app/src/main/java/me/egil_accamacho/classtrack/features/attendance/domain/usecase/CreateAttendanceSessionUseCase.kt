@@ -6,5 +6,6 @@ import javax.inject.Inject
 class CreateAttendanceSessionUseCase @Inject constructor(
     private val repository: AttendanceRepository,
 ) {
-    suspend operator fun invoke(courseId: Long) = repository.createSession(courseId)
+    suspend operator fun invoke(courseId: Long, durationMinutes: Int? = null) =
+        repository.createSession(courseId, durationMinutes)
 }

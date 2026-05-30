@@ -9,11 +9,13 @@ data class CreateAttendanceSessionUiState(
     val loading: Boolean = false,
     val error: String? = null,
     val courseName: String = "",
+    val durationMinutes: Int = 30,
 )
 
 sealed interface CreateAttendanceSessionEvent {
     data object CreateSession : CreateAttendanceSessionEvent
     data object DismissError : CreateAttendanceSessionEvent
+    data class DurationChanged(val minutes: Int) : CreateAttendanceSessionEvent
 }
 
 sealed interface CreateAttendanceSessionAction {
@@ -21,6 +23,7 @@ sealed interface CreateAttendanceSessionAction {
         val sessionId: Long,
         val qrToken: String,
         val expiresAt: String,
+        val durationMinutes: Int,
     ) : CreateAttendanceSessionAction
 }
 
@@ -31,6 +34,7 @@ data class AttendanceQrUiState(
     val error: String? = null,
     val qrBitmap: Bitmap? = null,
     val remainingSeconds: Int = 0,
+    val totalSeconds: Int = 1800,
     val records: List<AttendanceRecord> = emptyList(),
 )
 

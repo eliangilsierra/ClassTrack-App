@@ -121,7 +121,7 @@ fun AttendanceQrScreen(
                 QrDisplay(
                     bitmap = state.qrBitmap,
                     remainingSeconds = state.remainingSeconds,
-                    totalSeconds = state.remainingSeconds.coerceAtLeast(1),
+                    totalSeconds = state.totalSeconds,
                     modifier = Modifier.fillMaxWidth(0.78f),
                 )
 

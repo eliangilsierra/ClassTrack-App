@@ -2,7 +2,9 @@ package me.egil_accamacho.classtrack.features.attendance.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +16,8 @@ import androidx.compose.material.icons.automirrored.rounded.EventNote
 import androidx.compose.material.icons.rounded.QrCode2
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,6 +42,8 @@ import me.egil_accamacho.classtrack.ui.theme.CtPrimary
 import me.egil_accamacho.classtrack.ui.theme.CtSpacing
 import me.egil_accamacho.classtrack.ui.theme.ShapePrimary
 
+private val DURATION_OPTIONS = listOf(10, 20, 30, 45, 60)
+
 @Composable
 fun CreateAttendanceSessionScreen(
     navController: NavController,
@@ -52,9 +58,10 @@ fun CreateAttendanceSessionScreen(
                 is CreateAttendanceSessionAction.NavigateToQr ->
                     navController.navigate(
                         Destination.AttendanceQr(
-                            sessionId = action.sessionId,
-                            qrToken   = action.qrToken,
-                            expiresAt = action.expiresAt,
+                            sessionId       = action.sessionId,
+                            qrToken         = action.qrToken,
+                            expiresAt       = action.expiresAt,
+                            durationMinutes = action.durationMinutes,
                         ),
                     )
             }
@@ -144,6 +151,32 @@ fun CreateAttendanceSessionScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
+                }
+            }
+
+            // ── Duration picker ───────────────────────────────────────────────
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Duración del QR",
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+                Spacer(modifier = Modifier.height(CtSpacing.sm))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(CtSpacing.sm),
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                ) {
+                    DURATION_OPTIONS.forEach { minutes ->
+                        FilterChip(
+                            selected = state.durationMinutes == minutes,
+                            onClick = { viewModel.onEvent(CreateAttendanceSessionEvent.DurationChanged(minutes)) },
+                            label = { Text("$minutes min") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = CtPrimary,
+                                selectedLabelColor = androidx.compose.ui.graphics.Color.White,
+                            ),
+                        )
+                    }
                 }
             }
 
