@@ -1,58 +1,61 @@
 package me.egil_accamacho.classtrack.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+// ── Color schemes ─────────────────────────────────────────────────────────────
+// Dynamic color is intentionally DISABLED to preserve the ClassTrack brand.
+// See docs/Manual_Marca_ClassTrack.md §8.
+
+private val CtLightColorScheme = lightColorScheme(
+    primary          = CtPrimary,
+    onPrimary        = CtOnPrimary,
+    primaryContainer = CtPrimaryLight,
+    secondary        = CtSecondary,
+    onSecondary      = CtOnPrimary,
+    background       = CtBackgroundLight,
+    onBackground     = CtPrimaryTextLight,
+    surface          = CtSurfaceLight,
+    onSurface        = CtPrimaryTextLight,
+    surfaceVariant   = CtSurfaceVariantLight,
+    onSurfaceVariant = CtSecondaryTextLight,
+    error            = CtError,
+    onError          = CtOnPrimary,
+    outline          = CtBorderLight,
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val CtDarkColorScheme = darkColorScheme(
+    primary          = CtPrimary,
+    onPrimary        = CtOnPrimary,
+    primaryContainer = CtPrimaryDark,
+    secondary        = CtSecondary,
+    onSecondary      = CtOnPrimary,
+    background       = CtBackgroundDark,
+    onBackground     = CtPrimaryTextDark,
+    surface          = CtSurfaceDark,
+    onSurface        = CtPrimaryTextDark,
+    surfaceVariant   = CtSurfaceVariantDark,
+    onSurfaceVariant = CtSecondaryTextDark,
+    error            = CtError,
+    onError          = CtOnPrimary,
 )
+
+// ── Theme entry point ─────────────────────────────────────────────────────────
 
 @Composable
 fun ClasstrackTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) CtDarkColorScheme else CtLightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
-        content = content
+        typography  = Typography,
+        shapes      = CtShapes,
+        content     = content
     )
 }
