@@ -1,5 +1,6 @@
 package me.egil_accamacho.classtrack.features.courses.data.repository
 
+import android.util.Log
 import me.egil_accamacho.classtrack.core.common.Resource
 import me.egil_accamacho.classtrack.core.common.safeCall
 import me.egil_accamacho.classtrack.core.network.ErrorMapper
@@ -20,7 +21,7 @@ class CourseRepositoryImpl @Inject constructor(
 ) : CourseRepository {
 
     override suspend fun getCourses(): Resource<List<Course>> = safeCall(errorMapper) {
-        val remote = api.getCourses()
+        val remote = api.getCourses().data ?: emptyList()
         val entities = remote.map { dto ->
             CourseEntity(id = dto.id, name = dto.name, studentCount = dto.studentCount)
         }
@@ -30,14 +31,16 @@ class CourseRepositoryImpl @Inject constructor(
 
     override suspend fun getCourseDetail(courseId: Long): Resource<Course> =
         safeCall(errorMapper) {
-            val dto = api.getCourseDetail(courseId)
+            val dto = api.getCourseDetail(courseId).data
+                ?: throw Exception("Detalle de curso vacío")
             dao.upsert(CourseEntity(id = dto.id, name = dto.name, description = dto.description, studentCount = dto.studentCount))
             Course(id = dto.id, name = dto.name, description = dto.description, studentCount = dto.studentCount)
         }
 
     override suspend fun createCourse(name: String, description: String): Resource<Course> =
         safeCall(errorMapper) {
-            val dto = api.createCourse(CreateCourseRequest(name = name, description = description))
+            val dto = api.createCourse(CreateCourseRequest(name = name, description = description)).data
+                ?: throw Exception("Respuesta de creación de curso vacía")
             val entity = CourseEntity(id = dto.id, name = dto.name, description = dto.description, studentCount = dto.studentCount)
             dao.upsert(entity)
             Course(id = dto.id, name = dto.name, description = dto.description, studentCount = dto.studentCount)
@@ -51,7 +54,7 @@ class CourseRepositoryImpl @Inject constructor(
 
     override suspend fun getCourseStudents(courseId: Long): Resource<List<StudentSummary>> =
         safeCall(errorMapper) {
-            api.getCourseStudents(courseId).map { dto ->
+            (api.getCourseStudents(courseId).data ?: emptyList()).map { dto ->
                 StudentSummary(id = dto.id, fullName = dto.fullName, studentCode = dto.studentCode)
             }
         }
@@ -65,12 +68,12 @@ class CourseRepositoryImpl @Inject constructor(
 
     private fun CourseEntity.toDomain() = Course(id = id, name = name, description = description, studentCount = studentCount)
 
-    /** On network failure, try to serve cached data instead of propagating the error. */
     private suspend fun <T> Resource<T>.recoverFromCache(cacheBlock: suspend () -> T): Resource<T> {
         if (this is Resource.Error) {
             return try {
                 Resource.Success(cacheBlock())
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e("CourseRepository", "Cache recovery failed", e)
                 this
             }
         }

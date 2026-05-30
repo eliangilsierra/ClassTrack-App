@@ -3,15 +3,12 @@ package me.egil_accamacho.classtrack.core.network
 import kotlinx.serialization.Serializable
 
 /**
- * Standard success response envelope used by auth endpoints.
+ * Standard success response envelope used by all endpoints.
  * See docs/04-api-contracts.md §"Formato Respuesta Exitosa".
  *
  * ```json
  * { "success": true, "message": "...", "data": { ... } }
  * ```
- *
- * Note: not all endpoints wrap their response in this envelope.
- * Resource endpoints (courses, profile, attendance) return the DTO directly.
  */
 @Serializable
 data class ApiEnvelope<T>(
