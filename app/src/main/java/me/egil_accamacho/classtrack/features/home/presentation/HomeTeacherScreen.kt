@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import me.egil_accamacho.classtrack.navigation.Destination
@@ -47,6 +49,11 @@ fun HomeTeacherScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LifecycleResumeEffect(Unit) {
+        viewModel.onEvent(HomeTeacherEvent.Load)
+        onPauseOrDispose {}
+    }
 
     LaunchedEffect(Unit) {
         viewModel.actions.collect { action ->
@@ -138,17 +145,16 @@ fun HomeTeacherScreen(
                         onClick = { viewModel.onEvent(HomeTeacherEvent.NavigateToCourseDetail(course.id)) },
                     )
                 }
-                if (state.courses.size > 5) {
-                    item {
-                        Text(
-                            text = "Ver todos los cursos →",
-                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
-                            color = CtPrimary,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = CtSpacing.sm),
-                        )
-                    }
+                item {
+                    Text(
+                        text = "Ver todos los cursos →",
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
+                        color = CtPrimary,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { viewModel.onEvent(HomeTeacherEvent.NavigateToCourses) }
+                            .padding(vertical = CtSpacing.sm),
+                    )
                 }
             }
 

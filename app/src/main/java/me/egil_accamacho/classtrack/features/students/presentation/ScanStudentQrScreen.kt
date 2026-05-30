@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +42,7 @@ fun ScanStudentQrScreen(
     viewModel: ScanStudentQrViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.actions.collect { action ->
@@ -57,21 +60,28 @@ fun ScanStudentQrScreen(
         }
     }
 
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.onEvent(ScanStudentQrEvent.DismissError)
+        }
+    }
+
     CameraPermissionRequester(
         onDismiss = { navController.popBackStack() },
     ) {
-        CameraQrContent(
-            processing = state.processing,
-            onQrDetected = { content ->
-                viewModel.onEvent(ScanStudentQrEvent.QrDetected(content))
-            },
-            onDismiss = { navController.popBackStack() },
-        )
-    }
-
-    if (state.error != null) {
-        LaunchedEffect(state.error) {
-            viewModel.onEvent(ScanStudentQrEvent.DismissError)
+        Box(modifier = Modifier.fillMaxSize()) {
+            CameraQrContent(
+                processing = state.processing,
+                onQrDetected = { content ->
+                    viewModel.onEvent(ScanStudentQrEvent.QrDetected(content))
+                },
+                onDismiss = { navController.popBackStack() },
+            )
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
         }
     }
 }

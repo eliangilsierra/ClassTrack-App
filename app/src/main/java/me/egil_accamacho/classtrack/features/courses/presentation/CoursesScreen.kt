@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import me.egil_accamacho.classtrack.navigation.Destination
@@ -40,6 +41,11 @@ fun CoursesScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LifecycleResumeEffect(Unit) {
+        viewModel.onEvent(CoursesEvent.Load)
+        onPauseOrDispose {}
+    }
 
     LaunchedEffect(Unit) {
         viewModel.actions.collect { action ->
@@ -107,6 +113,7 @@ fun CoursesScreen(
                         studentCount = course.studentCount,
                         lastSession = "—",
                         onClick = { viewModel.onEvent(CoursesEvent.NavigateToDetail(course.id)) },
+                        onDelete = { viewModel.onEvent(CoursesEvent.RequestDelete(course)) },
                     )
                 }
             }

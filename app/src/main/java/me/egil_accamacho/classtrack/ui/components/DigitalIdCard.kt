@@ -60,7 +60,7 @@ import me.egil_accamacho.classtrack.ui.theme.ShapePrimary
 fun DigitalIdCard(
     fullName: String,
     email: String,
-    studentCode: String,
+    studentCode: String?,
     qrBitmap: Bitmap?,
     modifier: Modifier = Modifier,
 ) {
@@ -123,7 +123,7 @@ fun DigitalIdCard(
                         .padding(horizontal = CtSpacing.md, vertical = CtSpacing.xs),
                 ) {
                     Text(
-                        text = studentCode,
+                        text = studentCode ?: "—",
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
                         color = CtPrimary,
                     )
