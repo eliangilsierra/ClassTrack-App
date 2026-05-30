@@ -4,44 +4,34 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dagger.hilt.android.AndroidEntryPoint
+import me.egil_accamacho.classtrack.navigation.ClassTrackNavGraph
+import me.egil_accamacho.classtrack.navigation.RootViewModel
 import me.egil_accamacho.classtrack.ui.theme.ClasstrackTheme
 
+/**
+ * Single Activity host — owns [RootViewModel] and passes session state down
+ * to [ClassTrackNavGraph] for role-aware bottom navigation.
+ */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val rootViewModel: RootViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             ClasstrackTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                val sessionState by rootViewModel.sessionState.collectAsStateWithLifecycle()
+                ClassTrackNavGraph(
+                    sessionState = sessionState,
+                    navigationEvent = rootViewModel.navigationEvent,
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ClasstrackTheme {
-        Greeting("Android")
     }
 }
