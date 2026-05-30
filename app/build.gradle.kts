@@ -21,6 +21,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.firebase.appdistribution)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -47,6 +49,20 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("staging") {
+            initWith(getByName("debug"))
+            // Hardcoded staging server — no env var needed for this build type
+            buildConfigField("String", "BASE_URL", "\"http://54.209.230.174:8080/api/v1/\"")
+            firebaseAppDistribution {
+                appId = localProps.getProperty("FIREBASE_APP_ID")
+                    ?: System.getenv("FIREBASE_APP_ID")
+                    ?: ""
+                releaseNotes = "Staging build v${defaultConfig.versionName} (${defaultConfig.versionCode})"
+                testers = localProps.getProperty("FIREBASE_TESTERS")
+                    ?: System.getenv("FIREBASE_TESTERS")
+                    ?: ""
+            }
         }
     }
 
