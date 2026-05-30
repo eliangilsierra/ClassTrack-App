@@ -1,5 +1,6 @@
 package me.egil_accamacho.classtrack.features.attendance.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -148,4 +149,6 @@ private fun formatRegisteredAt(raw: String): String = runCatching {
     // Input: "2026-05-30T18:05:00" → Output: "18:05"
     val timePart = raw.substringAfter("T").take(5)
     timePart
+}.onFailure {
+    Log.e("AttendanceSuccessScreen", "Error formatting registeredAt: $raw", it)
 }.getOrDefault(raw)

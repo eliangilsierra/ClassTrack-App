@@ -1,5 +1,7 @@
 package me.egil_accamacho.classtrack.core.common
 
+import android.util.Log
+
 /**
  * Represents the lifecycle of any async data operation.
  *
@@ -49,5 +51,6 @@ suspend fun <T> safeCall(
 ): Resource<T> = try {
     Resource.Success(block())
 } catch (e: Exception) {
+    Log.e("Resource", "Error in safeCall: ${e.message}", e)
     Resource.Error(mapper.map(e))
 }

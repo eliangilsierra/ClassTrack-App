@@ -1,5 +1,6 @@
 package me.egil_accamacho.classtrack.core.session
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -73,7 +74,8 @@ class DataStoreSessionManager @Inject constructor(
         private set
 
     override val sessionState: Flow<SessionState> = dataStore.data
-        .catch {
+        .catch { e ->
+            Log.e("SessionManager", "Error reading DataStore: ${e.message}", e)
             // If DataStore is corrupted, treat as unauthenticated
             emit(androidx.datastore.preferences.core.emptyPreferences())
         }

@@ -1,5 +1,6 @@
 package me.egil_accamacho.classtrack.core.qr
 
+import android.util.Log
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -27,7 +28,8 @@ object QrParser {
             )
             else -> QrPayload.Unknown
         }
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+        Log.e("QrParser", "Failed to parse QR content: $content", e)
         QrPayload.Unknown
     }
 }
