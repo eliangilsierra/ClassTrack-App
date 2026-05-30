@@ -112,7 +112,6 @@ fun QrDisplay(
                 Image(
                     bitmap = bitmap.asImageBitmap(),
                     contentDescription = "Código QR",
-                    colorFilter = ColorFilter.tint(Color.Black),
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f),

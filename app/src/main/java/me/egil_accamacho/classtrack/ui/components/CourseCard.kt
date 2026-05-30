@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.TrendingDown
 import androidx.compose.material.icons.rounded.TrendingUp
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.egil_accamacho.classtrack.ui.theme.ClasstrackTheme
 import me.egil_accamacho.classtrack.ui.theme.CtBorderLight
+import me.egil_accamacho.classtrack.ui.theme.CtError
 import me.egil_accamacho.classtrack.ui.theme.CtPrimary
 import me.egil_accamacho.classtrack.ui.theme.CtSpacing
 import me.egil_accamacho.classtrack.ui.theme.CtSuccess
@@ -63,6 +66,7 @@ fun CourseCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     attendancePct: Int? = null,
+    onDelete: (() -> Unit)? = null,
 ) {
     Column(
         modifier = modifier
@@ -111,6 +115,16 @@ fun CourseCard(
 
             if (attendancePct != null) {
                 AttendanceBadge(percentage = attendancePct)
+            }
+            if (onDelete != null) {
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "Eliminar curso",
+                        tint = CtError,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
             }
         }
 

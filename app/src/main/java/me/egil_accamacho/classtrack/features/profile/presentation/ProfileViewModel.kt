@@ -68,7 +68,8 @@ class ProfileViewModel @Inject constructor(
                 is Resource.Success -> {
                     val digitalId = result.data
                     _state.update { it.copy(loading = false, digitalId = digitalId) }
-                    qrEncoder.encode(digitalId.qrContent).onSuccess { bitmap ->
+                    val qrContent = """{"type":"USER","userId":${digitalId.userId}}"""
+                    qrEncoder.encode(qrContent).onSuccess { bitmap ->
                         _state.update { it.copy(qrBitmap = bitmap) }
                     }.onFailure {
                         _state.update { it.copy(error = "No se pudo generar el código QR") }
