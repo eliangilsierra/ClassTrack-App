@@ -1,0 +1,11 @@
+## ClassTrack — local configuration template
+## Copy this file to local.properties (gitignored) and fill in your values.
+
+# Android SDK path (set by Android Studio automatically)
+sdk.dir=/path/to/android/sdk
+
+# Backend API base URL
+# Development (emulator):  BASE_URL=http://10.0.2.2:8080/api/v1/
+# Development (device):    BASE_URL=http://<your-machine-ip>:8080/api/v1/
+# Production (Railway):    BASE_URL=https://api.classtrack.app/api/v1/
+BASE_URL=http://10.0.2.2:8080/api/v1/
