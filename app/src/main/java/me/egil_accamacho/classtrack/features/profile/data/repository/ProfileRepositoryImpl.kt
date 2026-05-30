@@ -17,22 +17,24 @@ class ProfileRepositoryImpl @Inject constructor(
 ) : ProfileRepository {
 
     override suspend fun getProfile(): Resource<UserProfile> = safeCall(errorMapper) {
-        val dto = api.getProfile()
+        val envelope = api.getProfile()
+        val data = envelope.data ?: throw Exception("Respuesta de perfil vacía")
         UserProfile(
-            id = dto.id,
-            fullName = dto.fullName,
-            email = dto.email,
-            role = dto.role,
+            id = data.id,
+            fullName = data.fullName,
+            email = data.email,
+            role = data.role,
         )
     }
 
     override suspend fun getDigitalId(): Resource<DigitalId> = safeCall(errorMapper) {
-        val dto = api.getDigitalId()
+        val envelope = api.getDigitalId()
+        val data = envelope.data ?: throw Exception("Respuesta de ID digital vacía")
         DigitalId(
-            userId = dto.userId,
-            fullName = dto.fullName,
-            studentCode = dto.studentCode,
-            qrContent = dto.qrContent,
+            userId = data.userId,
+            fullName = data.fullName,
+            studentCode = data.studentCode,
+            qrContent = data.qrContent,
         )
     }
 }

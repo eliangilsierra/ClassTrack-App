@@ -16,7 +16,8 @@ class ReportsRepositoryImpl @Inject constructor(
 
     override suspend fun getSessionReport(sessionId: Long): Resource<SessionReport> =
         safeCall(errorMapper) {
-            val dto = api.getSessionReport(sessionId)
+            val dto = api.getSessionReport(sessionId).data
+                ?: throw Exception("Reporte de sesión vacío")
             SessionReport(
                 sessionId     = dto.sessionId,
                 totalStudents = dto.totalStudents,
@@ -27,7 +28,8 @@ class ReportsRepositoryImpl @Inject constructor(
 
     override suspend fun getCourseReport(courseId: Long): Resource<CourseReport> =
         safeCall(errorMapper) {
-            val dto = api.getCourseReport(courseId)
+            val dto = api.getCourseReport(courseId).data
+                ?: throw Exception("Reporte de curso vacío")
             CourseReport(
                 courseId       = dto.courseId,
                 courseName     = dto.courseName,

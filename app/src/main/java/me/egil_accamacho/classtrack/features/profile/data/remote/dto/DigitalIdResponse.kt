@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class DigitalIdResponse(
     val userId: Long,
     val fullName: String,
-    val studentCode: String,
+    val studentCode: String? = null,
     val qrContent: String,
 )
